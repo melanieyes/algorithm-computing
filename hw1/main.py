@@ -1,98 +1,79 @@
-#Sorting Algorithm Time Complexity Comparision
+#Sorting Algorithms Comparison
 
-import random
-import time
+import random, time
 
-#selection sort
+# selection sort 
 
 def selection_sort(arr):
-    a = arr[:]
+    a = arr[:]                    
     n = len(a)
-    
-    for i in range (n):
-        min_index = i 
-        for j in range(i+1, n):
+    for i in range(n - 1):
+        min_index = i
+        for j in range(i + 1, n):
             if a[j] < a[min_index]:
                 min_index = j
-                a[i], a[min_index], a[j]
-                
-        return a 
-    
-#insertion sort   
+        a[i], a[min_index] = a[min_index], a[i]   # do the swap after scanning
+    return a
+
+# insertion sort
 
 def insertion_sort(arr):
     a = arr[:]
-    for i in range (1, len(a)):
+    for i in range(1, len(a)):
         key = a[i]
         j = i - 1
-        
-        while j >=0 and a[j] > key:
-            a[j+1] = a[j]         
+        while j >= 0 and a[j] > key:
+            a[j + 1] = a[j]
             j -= 1
-            a[j+1] = key
-        return a   
+        a[j + 1] = key                           
+    return a
 
-
-#merge sort
+# merge sort 
 
 def merge_sort(arr):
     if len(arr) <= 1:
         return arr
-    mid = len(arr)//2
+    mid = len(arr) // 2
     left = merge_sort(arr[:mid])
     right = merge_sort(arr[mid:])
-    
     return merge(left, right)
 
-
 def merge(left, right):
-    result = [] 
+    result = []
     i = j = 0
-    
     while i < len(left) and j < len(right):
         if left[i] <= right[j]:
-            result.append(left[i])
-            i += 1
+            result.append(left[i]); i += 1
         else:
-            result.append(right[j]) 
-            j += 1
-        
-        #append remaining elements from left and right
+            result.append(right[j]); j += 1
     result.extend(left[i:])
     result.extend(right[j:])
-    
-    return result  
-    
+    return result
 
-#quick sort
+
+# quick sort
 
 def quick_sort(arr):
     if len(arr) <= 1:
         return arr
-
     pivot = arr[len(arr)//2]
-    left = [x for x in arr if x < pivot] 
+    left  = [x for x in arr if x < pivot]
+    mid   = [x for x in arr if x == pivot]
     right = [x for x in arr if x > pivot]
-    mid = [x for x in arr if x == pivot]
-    
     return quick_sort(left) + mid + quick_sort(right)
 
-
 def generating_lists():
-    
-    size = [1000,1000,10000]
-    lists = {n: [random.randint(0, 10**6) for _ in range (n)] for n in size}
-    return lists
+    sizes = [1000, 10000, 100000]
+    return {n: [random.randint(0, 10**6) for _ in range(n)] for n in sizes}
 
-#measuring time complexity
+def measure_time(func, arr, repeats=1):
+    start = time.perf_counter()
+    for _ in range(repeats):
+        func(arr)
+    end = time.perf_counter()
+    return (end - start) / repeats
 
-def measure_time(func, arr):
-    start= time.time()
-    func(arr)
-    end= time.time()
-    return end - start
-
-list = generating_lists()
+data_sets = generating_lists()
 
 algorithms = {
     "Selection sort": selection_sort,
@@ -101,12 +82,9 @@ algorithms = {
     "Quick sort": quick_sort
 }
 
-
-for n, arr in list.items():
+for n, arr in data_sets.items():
     print(f"/List size = {n}")
     for name, func in algorithms.items():
-        if n > 1000 and name in ["Selection sort", "Insertion sort"]:
-            print(f"{name}: skipped")
-            continue
-        time_taken = measure_time(func,arr)
-        print(f"{name}: {time_taken: .5f} seconds")
+        
+        t = measure_time(func, arr)
+        print(f"{name}: {t:.5f} seconds")
